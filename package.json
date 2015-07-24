@@ -1,6 +1,6 @@
 {
   "name": "lightning-line",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "dependencies": {
     "d3": "^3.5.5",
     "d3-multiaxis-zoom": "^1.0.4",
