@@ -7,7 +7,7 @@ var utils = require('lightning-client-utils');
 var LightningVisualization = require('lightning-visualization');
 
 var fs = require('fs');
-var styles = fs.readFileSync(__dirname + '/styles/styles.css');
+var styles = fs.readFileSync(__dirname + '/style.css');
 
 /*
  * Extend the base visualization object
