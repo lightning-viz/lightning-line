@@ -2,18 +2,16 @@
   "name": "lightning-line",
   "version": "0.0.1",
   "dependencies": {
+    "brfs": "^1.4.0",
     "d3": "^3.5.5",
     "d3-multiaxis-zoom": "^1.0.4",
-    "lodash": "^3.8.0",
     "lightning-client-utils": "^0.6.3",
-    "lightning-visualization": "^0.0.4"
+    "lightning-visualization": "^0.0.6",
+    "lodash": "^3.8.0"
   },
   "keywords": [
     "lightning-visualization"
   ],
-  "devDependencies": {
-    "brfs": "^1.4.0"
-  },
   "engines": {
     "node": ">=0.8.0"
   },
