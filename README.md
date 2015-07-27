@@ -1,4 +1,4 @@
-# Lightning Map
+# Lightning Line
 
 Line plot for **Lightning**
 
