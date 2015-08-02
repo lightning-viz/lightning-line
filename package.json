@@ -25,6 +25,6 @@
     "url": "git+https://github.com/lightning-viz/lightning-line.git"
   },
   "lightning": {
-    "sampleData": []
+    "name": "line"
   }
 }
