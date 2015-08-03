@@ -16,7 +16,7 @@ var Visualization = LightningVisualization.extend({
 
     init: function() {
         MultiaxisZoom(d3);
-        this.margin = {top: 30, right: 20, bottom: 20, left: 45};
+        this.margin = {top: 0, right: 0, bottom: 20, left: 45};
         if(_.has(this.data, 'xaxis')) {
             this.margin.bottom = 57;
         }
@@ -72,11 +72,11 @@ var Visualization = LightningVisualization.extend({
 
             self.x = d3.scale.linear()
                 .domain([xDomain[0] - 0.05 * xSpread, xDomain[1] + 0.05 * xSpread])
-                .range([0, width]);
+                .range([0, width - margin.left - margin.right]);
 
             self.y = d3.scale.linear()
                 .domain([yDomain[0] - 0.1 * ySpread, yDomain[1] + 0.1 * ySpread])
-                .range([height, 0]);
+                .range([height - margin.top - margin.bottom, 0]);
 
             self.xAxis = d3.svg.axis()
                 .scale(self.x)
@@ -107,16 +107,18 @@ var Visualization = LightningVisualization.extend({
 
         var container = d3.select(selector)
             .append('div')
-            .style('width', width + margin.left + margin.right + "px")
-            .style('height', height + margin.top + margin.bottom + "px")
+            .style('width', width + "px")
+            .style('height', height + "px")
 
         var canvas = container
             .append('canvas')
             .attr('class', 'line-plot canvas')
-            .attr('width', width)
-            .attr('height', height)
-            .style('margin', margin.top + 'px ' + margin.left + 'px')
-            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+            .attr('width', width - margin.left - margin.right)
+            .attr('height', height - margin.top - margin.bottom)
+            .style('margin-left', margin.left + 'px')
+            .style('margin-right', margin.right + 'px')
+            .style('margin-top', margin.top + 'px')
+            .style('margin-bottom', margin.bottom + 'px')
             .call(self.zoom)
 
         var ctx = canvas
@@ -125,15 +127,15 @@ var Visualization = LightningVisualization.extend({
         var svg = container
             .append('svg:svg')
             .attr('class', 'line-plot svg')
-            .attr('width', width + margin.left + margin.right)
-            .attr('height', height + margin.top + margin.bottom)
+            .attr('width', width)
+            .attr('height', height)
             .append('svg:g')
             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
             .call(self.zoom)
 
         svg.append('rect')
-            .attr('width', width)
-            .attr('height', height)
+            .attr('width', width - margin.left - margin.right)
+            .attr('height', height - margin.top - margin.bottom)
             .attr('class', 'line-plot rect');
 
         var makeXAxis = function () {
@@ -152,7 +154,7 @@ var Visualization = LightningVisualization.extend({
 
         svg.append('svg:g')
             .attr('class', 'x axis')
-            .attr('transform', 'translate(0, ' + height + ')')
+            .attr('transform', 'translate(0, ' + (height - margin.top - margin.bottom) + ')')
             .call(this.xAxis);
 
         svg.append('g')
@@ -161,15 +163,15 @@ var Visualization = LightningVisualization.extend({
 
         svg.append('g')
             .attr('class', 'x grid')
-            .attr('transform', 'translate(0,' + height + ')')
+            .attr('transform', 'translate(0,' + (height - margin.top - margin.bottom) + ')')
             .call(makeXAxis()
-                    .tickSize(-height, 0, 0)
+                    .tickSize(-(height - margin.top - margin.bottom), 0, 0)
                     .tickFormat(''));
 
         svg.append('g')
             .attr('class', 'y grid')
             .call(makeYAxis()
-                    .tickSize(-width, 0, 0)
+                    .tickSize(-(width - margin.left - margin.right), 0, 0)
                     .tickFormat(''));
 
         if(_.has(this.data, 'xaxis')) {
@@ -180,8 +182,8 @@ var Visualization = LightningVisualization.extend({
             svg.append("text")
                 .attr("class", "x label")
                 .attr("text-anchor", "middle")
-                .attr("x", width / 2)
-                .attr("y", height + margin.bottom - 5)
+                .attr("x", (width - margin.left - margin.right) / 2)
+                .attr("y", height - margin.top)
                 .text(txt);
         }
         if(_.has(this.data, 'yaxis')) {
@@ -194,8 +196,8 @@ var Visualization = LightningVisualization.extend({
                 .attr("class", "y label")
                 .attr("text-anchor", "middle")
                 .attr("transform", "rotate(-90)")
-                .attr("x", - height / 2)
-                .attr("y", -50)
+                .attr("x", - (height - margin.top - margin.bottom) / 2)
+                .attr("y", -margin.left + 20)
                 .text(txt);
         }
 
@@ -207,11 +209,11 @@ var Visualization = LightningVisualization.extend({
             svg.select('.y.axis').call(self.yAxis);
             svg.select('.x.grid')
                 .call(makeXAxis()
-                    .tickSize(-height, 0, 0)
+                    .tickSize(-(height - margin.top - margin.bottom), 0, 0)
                     .tickFormat(''));
             svg.select('.y.grid')
                 .call(makeYAxis()
-                        .tickSize(-width, 0, 0)
+                        .tickSize(-(width - margin.left - margin.right), 0, 0)
                         .tickFormat(''));
         }
 
@@ -221,7 +223,7 @@ var Visualization = LightningVisualization.extend({
         }
 
         function redraw() {
-            ctx.clearRect(0, 0, width + margin.left + margin.right, height + margin.top + margin.bottom);
+            ctx.clearRect(0, 0, width - margin.left - margin.right, height - margin.top - margin.bottom);
             draw()
         }
 
