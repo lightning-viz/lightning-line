@@ -3,15 +3,10 @@ var d3 = require('d3');
 var MultiaxisZoom = require('d3-multiaxis-zoom');
 var _ = require('lodash');
 var utils = require('lightning-client-utils');
-
 var LightningVisualization = require('lightning-visualization');
-
 var fs = require('fs');
-var styles = fs.readFileSync(__dirname + '/style.css');
+var css = fs.readFileSync(__dirname + '/style.css');
 
-/*
- * Extend the base visualization object
- */
 var Visualization = LightningVisualization.extend({
 
     init: function() {
@@ -26,7 +21,7 @@ var Visualization = LightningVisualization.extend({
         this.render();
     },
 
-    styles: styles,
+    css: css,
 
     render: function() {
 
@@ -34,18 +29,16 @@ var Visualization = LightningVisualization.extend({
         var height = this.height;
         var width = this.width;
         var margin = this.margin;
-        var opts = this.opts;
         var selector = this.selector;
         var self = this;
 
-        var series = data.series
-        this.series = series;
+        var series = data.series;
 
-        function setDefaultSize() {
-            self.defaultSize = Math.max(Math.exp(2 - 0.003 * self.series[0].d.length), 1);
+        function setSize() {
+            self.size = Math.max(Math.exp(2 - 0.003 * self.series[0].d.length), 1);
         }
         
-        setDefaultSize()
+        setSize();
 
         var nestedExtent = function(data, map) {
             var max = d3.max(data, function(arr) {
@@ -95,7 +88,7 @@ var Visualization = LightningVisualization.extend({
 
         }
 
-        setAxis()
+        setAxis();
 
         this.line = d3.svg.line()
             .x(function (d) {
@@ -103,12 +96,12 @@ var Visualization = LightningVisualization.extend({
             })
             .y(function (d) {
                 return self.y(d.y);
-            })
+            });
 
         var container = d3.select(selector)
             .append('div')
             .style('width', width + "px")
-            .style('height', height + "px")
+            .style('height', height + "px");
 
         var canvas = container
             .append('canvas')
@@ -119,10 +112,10 @@ var Visualization = LightningVisualization.extend({
             .style('margin-right', margin.right + 'px')
             .style('margin-top', margin.top + 'px')
             .style('margin-bottom', margin.bottom + 'px')
-            .call(self.zoom)
+            .call(self.zoom);
 
         var ctx = canvas
-            .node().getContext("2d")
+            .node().getContext("2d");
 
         var svg = container
             .append('svg:svg')
@@ -131,7 +124,7 @@ var Visualization = LightningVisualization.extend({
             .attr('height', height)
             .append('svg:g')
             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-            .call(self.zoom)
+            .call(self.zoom);
 
         svg.append('rect')
             .attr('width', width - margin.left - margin.right)
@@ -174,8 +167,9 @@ var Visualization = LightningVisualization.extend({
                     .tickSize(-(width - margin.left - margin.right), 0, 0)
                     .tickFormat(''));
 
+        var txt;
         if(_.has(this.data, 'xaxis')) {
-            var txt = this.data.xaxis;
+            txt = this.data.xaxis;
             if(_.isArray(txt)) {
                 txt = txt[0];
             }
@@ -187,7 +181,7 @@ var Visualization = LightningVisualization.extend({
                 .text(txt);
         }
         if(_.has(this.data, 'yaxis')) {
-            var txt = this.data.yaxis;
+            txt = this.data.yaxis;
             if(_.isArray(txt)) {
                 txt = txt[0];
             }
@@ -200,8 +194,6 @@ var Visualization = LightningVisualization.extend({
                 .attr("y", -margin.left + 20)
                 .text(txt);
         }
-
-        draw();
 
         function updateAxis() {
 
@@ -246,6 +238,8 @@ var Visualization = LightningVisualization.extend({
 
         }
 
+        draw();
+
         this.svg = svg;
         this.canvas = canvas;
         this.zoomed = zoomed;
@@ -286,29 +280,27 @@ var Visualization = LightningVisualization.extend({
         if (retColor.length == 0) {
             retColor = utils.getColors(data.series.length)
         }
-        var retSize = data.size || []
+        var retSize = data.size || [];
 
         // embed properties in data array
         data.series = data.series.map(function(line, i) {
-            var d = {'d': line, 'i': i}
-            d.c = retColor.length > 1 ? retColor[i] : retColor[0]
-            d.s = retSize.length > 1 ? retSize[i] : retSize[0]
+            var d = {'d': line, 'i': i};
+            d.c = retColor.length > 1 ? retColor[i] : retColor[0];
+            d.s = retSize.length > 1 ? retSize[i] : retSize[0];
             return d
-        })
+        });
 
         return data;
     },
 
     updateData: function(formattedData) {
         this.data = formattedData;
-        // TODO: re-render the visualization
+        this.redraw();
     },
 
-    appendData: function(formattedData) {        
-        // TODO: update this.data to include the newly
-        //       added formattedData
-
-        // TODO: re-render the visualization
+    appendData: function(formattedData) {
+        this.data.series = this.data.series.concat(formattedData.series);
+        this.redraw();
     }
 
 });
