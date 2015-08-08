@@ -25,20 +25,11 @@ var Visualization = LightningVisualization.extend({
 
     render: function() {
 
-        var data = this.data;
         var height = this.height;
         var width = this.width;
         var margin = this.margin;
         var selector = this.selector;
         var self = this;
-
-        var series = data.series;
-
-        function setSize() {
-            self.size = Math.max(Math.exp(2 - 0.003 * self.series[0].d.length), 1);
-        }
-        
-        setSize();
 
         var nestedExtent = function(data, map) {
             var max = d3.max(data, function(arr) {
@@ -53,10 +44,10 @@ var Visualization = LightningVisualization.extend({
 
         function setAxis() {
         
-            var yDomain = nestedExtent(self.series.map(function(d) {return d.d}), function(d) {
+            var yDomain = nestedExtent(self.data.series.map(function(d) {return d.d}), function(d) {
                 return d.y;
             });
-            var xDomain = nestedExtent(self.series.map(function(d) {return d.d}), function(d) {
+            var xDomain = nestedExtent(self.data.series.map(function(d) {return d.d}), function(d) {
                 return d.x;
             });
 
@@ -216,14 +207,14 @@ var Visualization = LightningVisualization.extend({
 
         function redraw() {
             ctx.clearRect(0, 0, width - margin.left - margin.right, height - margin.top - margin.bottom);
-            draw()
+            draw();
         }
 
         function draw() {
 
             ctx.globalAlpha = 0.9;
 
-            _.forEach(self.series, function(s) {
+            _.forEach(self.data.series, function(s) {
                 var t = s.d.length, d, i = 0;
                 ctx.strokeStyle = s.c ? s.c : self.defaultSize;
                 ctx.lineWidth = s.s ? s.s : self.defaultSize;
@@ -243,10 +234,6 @@ var Visualization = LightningVisualization.extend({
         this.svg = svg;
         this.canvas = canvas;
         this.zoomed = zoomed;
-        this.updateAxis = updateAxis;
-        this.setAxis = setAxis;
-        this.setDefaultSize = setDefaultSize;
-        this.series = series;
         this.redraw = redraw;
 
     },
@@ -282,11 +269,14 @@ var Visualization = LightningVisualization.extend({
         }
         var retSize = data.size || [];
 
+        var s;
+
         // embed properties in data array
         data.series = data.series.map(function(line, i) {
             var d = {'d': line, 'i': i};
+            s = retSize.length > 1 ? retSize[i] : retSize[0];
             d.c = retColor.length > 1 ? retColor[i] : retColor[0];
-            d.s = retSize.length > 1 ? retSize[i] : retSize[0];
+            d.s = s ? s : Math.max(Math.exp(2 - 0.003 * line.length), 1);
             return d
         });
 
@@ -304,6 +294,5 @@ var Visualization = LightningVisualization.extend({
     }
 
 });
-
 
 module.exports = Visualization;
