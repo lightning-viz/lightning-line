@@ -11,12 +11,12 @@ var Visualization = LightningVisualization.extend({
 
     init: function() {
         MultiaxisZoom(d3);
-        this.margin = {top: 0, right: 0, bottom: 20, left: 45};
+        this.margin = {top: 0, right: 0, bottom: 20, left: 60};
         if(_.has(this.data, 'xaxis')) {
             this.margin.bottom = 57;
         }
         if(_.has(this.data, 'yaxis')) {
-            this.margin.left = 70;
+            this.margin.left = 85;
         }
         this.render();
     },
@@ -24,6 +24,8 @@ var Visualization = LightningVisualization.extend({
     css: css,
 
     render: function() {
+
+        console.log(this.options)
 
         var height = this.height;
         var width = this.width;
@@ -54,6 +56,10 @@ var Visualization = LightningVisualization.extend({
             var ySpread = Math.abs(yDomain[1] - yDomain[0]) || 1;
             var xSpread = Math.abs(xDomain[1] - xDomain[0]) || 1;
 
+            function customTickFormat(d) {
+                return parseFloat(d3.format(".3f")(d))
+            }
+
             self.x = d3.scale.linear()
                 .domain([xDomain[0] - 0.05 * xSpread, xDomain[1] + 0.05 * xSpread])
                 .range([0, width - margin.left - margin.right]);
@@ -65,12 +71,14 @@ var Visualization = LightningVisualization.extend({
             self.xAxis = d3.svg.axis()
                 .scale(self.x)
                 .orient('bottom')
-                .ticks(5);
+                .ticks(5)
+                .tickFormat(customTickFormat);
 
             self.yAxis = d3.svg.axis()
                 .scale(self.y)
                 .orient('left')
-                .ticks(5);
+                .ticks(5)
+                .tickFormat(customTickFormat);
 
             self.zoom = d3.behavior.zoom()
                 .x(self.x)
@@ -168,7 +176,7 @@ var Visualization = LightningVisualization.extend({
                 .attr("class", "x label")
                 .attr("text-anchor", "middle")
                 .attr("x", (width - margin.left - margin.right) / 2)
-                .attr("y", height - margin.top)
+                .attr("y", height - margin.top - 5)
                 .text(txt);
         }
         if(_.has(this.data, 'yaxis')) {
@@ -215,12 +223,12 @@ var Visualization = LightningVisualization.extend({
             ctx.globalAlpha = 0.9;
 
             _.forEach(self.data.series, function(s) {
-                var t = s.d.length, d, i = 0;
-                ctx.strokeStyle = s.c ? s.c : self.defaultSize;
-                ctx.lineWidth = s.s ? s.s : self.defaultSize;
+                var t = s.d.length, i = 0;
+                ctx.strokeStyle = s.c;
+                ctx.lineWidth = s.s;
                 ctx.lineJoin = 'round';
                 ctx.beginPath();
-                ctx.moveTo(self.x(s.d[0].x), self.y(s.d[0].y))
+                ctx.moveTo(self.x(s.d[0].x), self.y(s.d[0].y));
                 while(++i < t) {
                     ctx.lineTo(self.x(s.d[i].x), self.y(s.d[i].y));
                 }
@@ -232,8 +240,11 @@ var Visualization = LightningVisualization.extend({
         draw();
 
         this.svg = svg;
+        this.ctx = ctx;
         this.canvas = canvas;
         this.zoomed = zoomed;
+        this.setAxis = setAxis;
+        this.updateAxis = updateAxis;
         this.redraw = redraw;
 
     },
