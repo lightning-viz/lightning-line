@@ -9,6 +9,12 @@ var css = fs.readFileSync(__dirname + '/style.css');
 
 var Visualization = LightningVisualization.extend({
 
+    getDefaultOptions: function() {
+        return {
+            zoom: true
+        }
+    },
+
     init: function() {
         MultiaxisZoom(d3);
         this.margin = {top: 0, right: 0, bottom: 20, left: 60};
@@ -119,9 +125,17 @@ var Visualization = LightningVisualization.extend({
             .attr('class', 'line-plot svg')
             .attr('width', width)
             .attr('height', height)
+            .attr('fill', 'white')
             .append('svg:g')
             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
             .call(self.zoom);
+
+        if (!self.options.zoom) {
+            svg.on("wheel.zoom", null);
+            svg.on("mousewheel.zoom", null);
+            canvas.on("wheel.zoom", null);
+            canvas.on("mousewheel.zoom", null);
+        }
 
         svg.append('rect')
             .attr('width', width - margin.left - margin.right)
