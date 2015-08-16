@@ -25,8 +25,6 @@ var Visualization = LightningVisualization.extend({
 
     render: function() {
 
-        console.log(this.options)
-
         var height = this.height;
         var width = this.width;
         var margin = this.margin;
@@ -272,20 +270,20 @@ var Visualization = LightningVisualization.extend({
             })];
         }
 
-        // parse colors and sizes, and automatically fill colors
+        // parse colors and thicknesses, and automatically fill colors
         // with our random colors if none provided
         var retColor = utils.getColorFromData(data);
         if (retColor.length == 0) {
             retColor = utils.getColors(data.series.length)
         }
-        var retSize = data.size || [];
+        var retThickness = data.thickness || [];
 
         var s;
 
         // embed properties in data array
         data.series = data.series.map(function(line, i) {
             var d = {'d': line, 'i': i};
-            s = retSize.length > 1 ? retSize[i] : retSize[0];
+            s = retThickness.length > 1 ? retThickness[i] : retThickness[0];
             d.c = retColor.length > 1 ? retColor[i] : retColor[0];
             d.s = s ? s : Math.max(Math.exp(2 - 0.003 * line.length), 1);
             return d
