@@ -3,6 +3,6 @@ from numpy import random, ceil, array
 
 lgn = Lightning()
 
-series = random.randn(10,500)
+series = random.randn(5,50)
 
 lgn.line(series)
