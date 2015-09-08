@@ -1,6 +1,6 @@
 {
   "name": "lightning-line",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "dependencies": {
     "brfs": "^1.4.0",
     "d3": "^3.5.5",
