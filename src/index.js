@@ -49,7 +49,7 @@ var Visualization = LightningVisualization.extend({
         };
 
         function setAxis() {
-        
+
             var yDomain = nestedExtent(self.data.series.map(function(d) {return d.d}), function(d) {
                 return d.y;
             });
@@ -65,7 +65,7 @@ var Visualization = LightningVisualization.extend({
             }
 
             self.x = d3.scale.linear()
-                .domain([xDomain[0] - 0.05 * xSpread, xDomain[1] + 0.05 * xSpread])
+                .domain([self.options.xlim xDomain[0] - 0.05 * xSpread, xDomain[1] + 0.05 * xSpread])
                 .range([0, width - margin.left - margin.right]);
 
             self.y = d3.scale.linear()
@@ -114,8 +114,7 @@ var Visualization = LightningVisualization.extend({
             .style('margin-left', margin.left + 'px')
             .style('margin-right', margin.right + 'px')
             .style('margin-top', margin.top + 'px')
-            .style('margin-bottom', margin.bottom + 'px')
-            .call(self.zoom);
+            .style('margin-bottom', margin.bottom + 'px');
 
         var ctx = canvas
             .node().getContext("2d");
@@ -127,14 +126,11 @@ var Visualization = LightningVisualization.extend({
             .attr('height', height)
             .attr('fill', 'white')
             .append('svg:g')
-            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-            .call(self.zoom);
+            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-        if (!self.options.zoom) {
-            svg.on("wheel.zoom", null);
-            svg.on("mousewheel.zoom", null);
-            canvas.on("wheel.zoom", null);
-            canvas.on("mousewheel.zoom", null);
+        if (self.options.zoom) {
+          svg.call(self.zoom);
+          canvas.call(self.zoom);
         }
 
         svg.append('rect')
