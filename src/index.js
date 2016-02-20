@@ -65,11 +65,11 @@ var Visualization = LightningVisualization.extend({
             }
 
             self.x = d3.scale.linear()
-                .domain([self.options.xlim xDomain[0] - 0.05 * xSpread, xDomain[1] + 0.05 * xSpread])
+                .domain(self.data.xlim || [xDomain[0] - 0.05 * xSpread, xDomain[1] + 0.05 * xSpread])
                 .range([0, width - margin.left - margin.right]);
 
             self.y = d3.scale.linear()
-                .domain([yDomain[0] - 0.1 * ySpread, yDomain[1] + 0.1 * ySpread])
+                .domain(self.data.ylim || [yDomain[0] - 0.1 * ySpread, yDomain[1] + 0.1 * ySpread])
                 .range([height - margin.top - margin.bottom, 0]);
 
             self.xAxis = d3.svg.axis()
@@ -203,7 +203,6 @@ var Visualization = LightningVisualization.extend({
         }
 
         function updateAxis() {
-
             svg.select('.x.axis').call(self.xAxis);
             svg.select('.y.axis').call(self.yAxis);
             svg.select('.x.grid')
@@ -304,11 +303,13 @@ var Visualization = LightningVisualization.extend({
 
     updateData: function(formattedData) {
         this.data = formattedData;
+        this.setAxis();
         this.redraw();
     },
 
     appendData: function(formattedData) {
         this.data.series = this.data.series.concat(formattedData.series);
+        this.setAxis();
         this.redraw();
     }
 
