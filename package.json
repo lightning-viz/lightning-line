@@ -5,6 +5,7 @@
     "brfs": "^1.4.0",
     "d3": "^3.5.5",
     "d3-multiaxis-zoom": "^1.0.4",
+    "lightning-axis-visualization": "^1.0.0",
     "lightning-client-utils": "^0.7.0",
     "lightning-visualization": "^0.1.4",
     "lodash": "^3.8.0"

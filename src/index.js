@@ -3,11 +3,11 @@ var d3 = require('d3');
 var MultiaxisZoom = require('d3-multiaxis-zoom');
 var _ = require('lodash');
 var utils = require('lightning-client-utils');
-var LightningVisualization = require('lightning-visualization');
+var LightningAxisVisualization = require('lightning-axis-visualization');
 var fs = require('fs');
 var css = fs.readFileSync(__dirname + '/style.css');
 
-var Visualization = LightningVisualization.extend({
+var Visualization = LightningAxisVisualization.extend({
 
     getDefaultOptions: function() {
         return {
@@ -60,29 +60,12 @@ var Visualization = LightningVisualization.extend({
             var ySpread = Math.abs(yDomain[1] - yDomain[0]) || 1;
             var xSpread = Math.abs(xDomain[1] - xDomain[0]) || 1;
 
-            function customTickFormat(d) {
-                return parseFloat(d3.format(".3f")(d))
-            }
 
-            self.x = d3.scale.linear()
-                .domain(self.data.xlim || [xDomain[0] - 0.05 * xSpread, xDomain[1] + 0.05 * xSpread])
-                .range([0, width - margin.left - margin.right]);
+            self.x = self.getXScale(xDomain);
+            self.y = self.getYScale(yDomain);
 
-            self.y = d3.scale.linear()
-                .domain(self.data.ylim || [yDomain[0] - 0.1 * ySpread, yDomain[1] + 0.1 * ySpread])
-                .range([height - margin.top - margin.bottom, 0]);
-
-            self.xAxis = d3.svg.axis()
-                .scale(self.x)
-                .orient('bottom')
-                .ticks(5)
-                .tickFormat(customTickFormat);
-
-            self.yAxis = d3.svg.axis()
-                .scale(self.y)
-                .orient('left')
-                .ticks(5)
-                .tickFormat(customTickFormat);
+            self.xAxis = self.getXAxis(self.x);
+            self.yAxis = self.getYAxis(self.y);
 
             self.zoom = d3.behavior.zoom()
                 .x(self.x)
@@ -257,6 +240,7 @@ var Visualization = LightningVisualization.extend({
     },
 
     formatData: function(data) {
+        var self = this;
 
         // parse the array data
         if(_.isArray(data.series[0])) {
@@ -264,8 +248,8 @@ var Visualization = LightningVisualization.extend({
             data.series = _.map(data.series, function(d) {
                 return _.map(d, function(datum, i) {
                     return {
-                        x: data.index ? data.index[i] : i,
-                        y: datum
+                        x: self.coerceValue(data.index ? data.index[i] : i, data.xscale),
+                        y: self.coerceValue(datum, data.yScale)
                     };
                 });
             });
@@ -273,8 +257,8 @@ var Visualization = LightningVisualization.extend({
             // handle a single series
             data.series = [_.map(data.series, function(d, i) {
                 return {
-                    x: data.index ? data.index[i] : i,
-                    y: d
+                    x: self.coerceValue(data.index ? data.index[i] : i, data.xscale),
+                    y: self.coerceValue(d, data.yScale)
                 };
             })];
         }
