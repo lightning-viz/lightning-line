@@ -289,12 +289,14 @@ var Visualization = LightningAxisVisualization.extend({
         this.data = formattedData;
         this.setAxis();
         this.redraw();
+        this.updateAxis();
     },
 
     appendData: function(formattedData) {
         this.data.series = this.data.series.concat(formattedData.series);
         this.setAxis();
         this.redraw();
+        this.updateAxis();
     }
 
 });
